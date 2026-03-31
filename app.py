@@ -20,11 +20,13 @@ def analyze(values, ranges, disease_name):
             else:
                 score += 1
 
+    # ✅ If all values normal
+    if score == 0:
+        return "Normal (No Disease Risk)", None
+
     ratio = score / (2 * total)
 
-    if ratio == 0:
-        severity = "Normal"
-    elif ratio < 0.3:
+    if ratio < 0.3:
         severity = "Mild"
     elif ratio < 0.6:
         severity = "Moderate"
@@ -33,17 +35,11 @@ def analyze(values, ranges, disease_name):
 
     return f"{disease_name} Risk", severity
 
+
 # ---------------- RECOMMENDATION ----------------
 
 def recommendation(severity):
-    if severity == "Normal":
-        return [
-            "Maintain balanced diet",
-            "Exercise regularly",
-            "Stay hydrated"
-        ], "No doctor consultation needed"
-
-    elif severity == "Mild":
+    if severity == "Mild":
         return [
             "Improve diet quality",
             "Drink more water",
@@ -69,6 +65,7 @@ def recommendation(severity):
             "Take medical tests immediately",
             "Continuous monitoring needed"
         ], "⚠️ Consult a doctor as soon as possible"
+
 
 # ---------------- TEST ----------------
 
@@ -225,21 +222,31 @@ elif test == "Sonography":
     ranges = [(10,16),(0,0),(9,12)]
     disease = "Gallstones / Organ Issue"
 
+
 # ---------------- OUTPUT ----------------
 
 if st.button("Analyze"):
     result, severity = analyze(values, ranges, disease)
-    tips, doctor_msg = recommendation(severity)
 
-    st.subheader("🔍 Predicted Disease Risk")
-    st.write(result)
+    # ✅ NORMAL CASE
+    if severity is None:
+        st.success("✅ Normal (No Disease Risk)")
+        st.write("✔️ Your parameters are within healthy range.")
+        st.write("✔️ Maintain a healthy lifestyle.")
 
-    st.subheader("⚠️ Severity Level")
-    st.write(severity)
+    # ✅ ABNORMAL CASE
+    else:
+        tips, doctor_msg = recommendation(severity)
 
-    st.subheader("💡 Tips & Precautions")
-    for tip in tips:
-        st.write("•", tip)
+        st.subheader("🔍 Predicted Disease Risk")
+        st.write(result)
 
-    st.subheader("👨‍⚕️ Medical Recommendation")
-    st.write(doctor_msg)
+        st.subheader("⚠️ Severity Level")
+        st.write(severity)
+
+        st.subheader("💡 Tips & Precautions")
+        for tip in tips:
+            st.write("•", tip)
+
+        st.subheader("👨‍⚕️ Medical Recommendation")
+        st.write(doctor_msg)
